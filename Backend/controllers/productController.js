@@ -1,7 +1,7 @@
 const Product = require("../models/productModel"); //importing product model
 const ErrorHandler= require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-
+const  ApiFeatures = require("../utils/apifeatures");
 
 
 //create product --Admin
@@ -19,8 +19,8 @@ exports.createProduct = catchAsyncErrors(async(req,res,next)=>{
 
 //Get All Product
 exports.getAllProducts = catchAsyncErrors(async(req,res)=>{ 
-    
-    const products = await Product.find();
+    const apiFeature= new ApiFeatures(Product.find(), req.query).search();
+    const products = await apiFeature.query;
 
     res.status(200).json({
         success:true,
@@ -72,19 +72,18 @@ exports.updateProduct = catchAsyncErrors(async (req,res,next)=>{
 
 //Delete Product
 exports.deleteProduct =catchAsyncErrors(async(req,res,next)=>{
-
-    const product = await Product.findById(req.params.id);
-    const product_id = req.params.id;
-
-    if(!product){
-        return next(new ErrorHandler("Product not found",404));
+    const id = req.params.id;
+    const data = await Product.findByIdAndDelete(id);
+    if(!data){
+        res.status(404).json({
+            message:"Product cannot be deleted"
+        })
     }
+    else{
+        res.status(200).json({
+            success:true,
+            message:"Product deleted successfully"
+    })}
 
-    //await product.remove();
-    await product.delete(product_id);
-
-    res.status(200).json({
-        success:true,
-        message:"Product deleted successfully"
-    })
+   
 });
