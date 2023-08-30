@@ -1,8 +1,10 @@
 const express = require("express");   // import the express module and create an Express application
 const app = express();     //routing HTTP requests
+const cookieParser = require("cookie-parser");
 
 const errorMiddleware = require("./middleware/error");
-app.use(express.json())
+app.use(express.json());
+app.use(cookieParser());
 
 //Route Imports
 const product = require("./routes/productRoute");
